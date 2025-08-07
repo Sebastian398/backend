@@ -6,7 +6,12 @@ from django.contrib.auth.models import User
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from .models import Sensor, ProgramacionRiego
-from .serializers import SensorSerializer, ProgramacionRiegoSerializer, UserRegisterSerializer
+from .serializers import (
+    SensorSerializer,
+    ProgramacionRiegoSerializer,
+    UserRegisterSerializer,
+    EmailTokenObtainPairSerializer
+)
 
 
 class RegisterView(generics.CreateAPIView):
@@ -29,12 +34,9 @@ class RegisterView(generics.CreateAPIView):
             )
 
 
-class LoginView(TokenObtainPairView):
-    permission_classes = (permissions.AllowAny,)
-
-
 class CustomLoginView(TokenObtainPairView):
     permission_classes = (permissions.AllowAny,)
+    serializer_class = EmailTokenObtainPairSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -47,10 +49,10 @@ class CustomLoginView(TokenObtainPairView):
             }, status=status.HTTP_401_UNAUTHORIZED)
 
         data = serializer.validated_data
-        user = request.data.get('username', '')
+        email = request.data.get('email', '')
 
         return Response({
-            "mensaje": f"¡Bienvenido, {user}!",
+            "mensaje": f"¡Bienvenido, {email}!",
             "access": data.get("access"),
             "refresh": data.get("refresh"),
         })
