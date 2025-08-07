@@ -1,17 +1,12 @@
 from rest_framework import viewsets, generics, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from .models import Sensor, ProgramacionRiego
-from .serializers import (
-    SensorSerializer,
-    ProgramacionRiegoSerializer,
-    UserRegisterSerializer,
-    CustomTokenObtainPairSerializer,
-)
+from .serializers import SensorSerializer, ProgramacionRiegoSerializer, UserRegisterSerializer
 
 
 class RegisterView(generics.CreateAPIView):
@@ -27,33 +22,42 @@ class RegisterView(generics.CreateAPIView):
                 {"mensaje": "Registro exitoso. ¡Bienvenido!", "usuario": serializer.data},
                 status=status.HTTP_201_CREATED
             )
-        return Response(
-            {"error": "Error en el registro", "detalles": serializer.errors},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        else:
+            return Response(
+                {"error": "Error en el registro", "detalles": serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
-class LoginView(APIView):
+class LoginView(TokenObtainPairView):
+    permission_classes = (permissions.AllowAny,)
+
+
+class CustomLoginView(TokenObtainPairView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request, *args, **kwargs):
-        serializer = CustomTokenObtainPairSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(
-                {"error": "Credenciales inválidas", "detalles": serializer.errors},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
-        user = serializer.validated_data['user']
-        refresh = RefreshToken.for_user(user)
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except Exception:
+            return Response({
+                "error": "Credenciales inválidas",
+                "detalles": serializer.errors
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+        data = serializer.validated_data
+        user = request.data.get('username', '')
+
         return Response({
-            "mensaje": f"¡Bienvenido, {user.first_name or user.username}!",
-            "access": str(refresh.access_token),
-            "refresh": str(refresh)
+            "mensaje": f"¡Bienvenido, {user}!",
+            "access": data.get("access"),
+            "refresh": data.get("refresh"),
         })
 
 
 class AccesoValidateView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         return Response({"mensaje": "Acceso concedido. Token válido y autenticación correcta."})
@@ -73,5 +77,6 @@ class ProgramacionRiegoViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def activar_riego(self, request, pk=None):
         programacion = self.get_object()
-        # Aquí puedes agregar la lógica para activar el riego mediante hardware
+        # Aquí podrías agregar la lógica real para activar el riego mediante hardware
+
         return Response({'mensaje': f'Riego activado por {programacion.duracion} minutos'})

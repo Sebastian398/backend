@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .views import SensorViewSet, ProgramacionRiegoViewSet, RegisterView, AccesoValidateView, LoginView
+from .views import SensorViewSet, ProgramacionRiegoViewSet, RegisterView, AccesoValidateView, CustomLoginView
 from rest_framework_simplejwt.views import TokenRefreshView
 
 
@@ -28,7 +28,7 @@ class ApiRootView(APIView):
 urlpatterns = [
     path('', ApiRootView.as_view(), name='api-root'),          
     path('register/', RegisterView.as_view(), name='register'), 
-    path('login/', LoginView.as_view(), name='login'),          
+    path('login/', CustomLoginView.as_view(), name='login'),          
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),  
     path('api/acceso-validate/', AccesoValidateView.as_view(), name='acceso-validate'),
     path('', include(router.urls)),                              
