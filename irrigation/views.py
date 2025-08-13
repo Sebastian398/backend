@@ -10,7 +10,8 @@ from .serializers import (
     SensorSerializer,
     ProgramacionRiegoSerializer,
     UserRegisterSerializer,
-    EmailTokenObtainPairSerializer
+    EmailTokenObtainPairSerializer,
+    UserDetailSerializer
 )
 
 
@@ -70,7 +71,13 @@ class SensorViewSet(viewsets.ModelViewSet):
     serializer_class = SensorSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+class UserDetailView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+        serializer = UserDetailSerializer(request.user)
+        return Response(serializer.data)
+    
 class ProgramacionRiegoViewSet(viewsets.ModelViewSet):
     queryset = ProgramacionRiego.objects.filter(activo=True)
     serializer_class = ProgramacionRiegoSerializer

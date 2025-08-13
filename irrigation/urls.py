@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .views import SensorViewSet, ProgramacionRiegoViewSet, RegisterView, AccesoValidateView, CustomLoginView
+from .views import SensorViewSet, ProgramacionRiegoViewSet, RegisterView, AccesoValidateView, CustomLoginView, UserDetailView
 from rest_framework_simplejwt.views import TokenRefreshView
 
 
@@ -21,6 +21,7 @@ class ApiRootView(APIView):
             'login': request.build_absolute_uri('login/'),
             'token_refresh': request.build_absolute_uri('token/refresh/'),
             'sensores': request.build_absolute_uri('sensores/'),
+            'datos': request.build_absolute_uri('usuario-actual/'),
             'programacion_riego': request.build_absolute_uri('programacion_riego/'),
         })
 
@@ -31,5 +32,6 @@ urlpatterns = [
     path('login/', CustomLoginView.as_view(), name='login'),          
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),  
     path('api/acceso-validate/', AccesoValidateView.as_view(), name='acceso-validate'),
+    path('usuario-actual/', UserDetailView.as_view(), name='usuario-actual'),
     path('', include(router.urls)),                              
 ]

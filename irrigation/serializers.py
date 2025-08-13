@@ -84,7 +84,10 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
             'access': str(refresh.access_token),
         }
 
-
+class UserDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']
 
 class SensorSerializer(serializers.ModelSerializer):
     class Meta:
