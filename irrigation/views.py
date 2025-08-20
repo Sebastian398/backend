@@ -11,7 +11,8 @@ from .serializers import (
     ProgramacionRiegoSerializer,
     UserRegisterSerializer,
     EmailTokenObtainPairSerializer,
-    UserDetailSerializer
+    UserDetailSerializer,
+    ProgramacionRiegoAdminSerializer
 )
 
 
@@ -89,3 +90,12 @@ class ProgramacionRiegoViewSet(viewsets.ModelViewSet):
         # Aquí podrías agregar la lógica real para activar el riego mediante hardware
 
         return Response({'mensaje': f'Riego activado por {programacion.duracion} minutos'})
+
+class ProgramacionRiegoAdminViewSet(viewsets.ModelViewSet):
+    """
+    Endpoint para listar, modificar y eliminar todas las programaciones de riego,
+    sin filtrado (todas activas e inactivas).
+    """
+    queryset = ProgramacionRiego.objects.all().order_by('-inicio')
+    serializer_class = ProgramacionRiegoAdminSerializer
+    permission_classes = [permissions.IsAuthenticated]

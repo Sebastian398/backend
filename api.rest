@@ -1,5 +1,5 @@
-GET  http://127.0.0.1:8000/api/usuario-actual/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU1MDUzODQ2LCJpYXQiOjE3NTUwNTM1NDYsImp0aSI6ImY2NDkxYWJiOThhNTQ2MzU4NTgyMTM1NjA2MTJmOTQ4IiwidXNlcl9pZCI6IjUifQ.__d23POgVt_bzTMPQOpwUZLxGi3FhAfrFF6GUleedWQ 
+GET  http://127.0.0.1:8000/api/programacion_riego/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU1NzIwMzU2LCJpYXQiOjE3NTU3MjAwNTYsImp0aSI6ImI3MDBkNDk3NTdjMTQ1OWY5ZTMyNjgyNDI5YWI0NjlkIiwidXNlcl9pZCI6IjUifQ.pj01MS7bj5ZU51yUINRT14fglc1VJ4RCvdGobhBA-nM 
 content-Type:application/json
 
 

@@ -34,7 +34,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         validated_data.pop('password2')
         email = validated_data['email']
 
-        # Generar username único basado en email
         base_username = email.split('@')[0]
         username = base_username
         while User.objects.filter(username=username).exists():
@@ -51,14 +50,13 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
 
 class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
-    username_field = User.EMAIL_FIELD  # 'email'
+    username_field = User.EMAIL_FIELD
 
     email = serializers.EmailField(write_only=True)
     password = serializers.CharField(write_only=True, style={'input_type': 'password'})
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Eliminar el campo username para que no aparezca en formulario/web
         self.fields.pop('username', None)
 
     def validate(self, attrs):
@@ -96,6 +94,10 @@ class SensorSerializer(serializers.ModelSerializer):
 
 
 class ProgramacionRiegoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProgramacionRiego
+        fields = '__all__'
+class ProgramacionRiegoAdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProgramacionRiego
         fields = '__all__'

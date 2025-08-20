@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .views import SensorViewSet, ProgramacionRiegoViewSet, RegisterView, AccesoValidateView, CustomLoginView, UserDetailView
+from .views import SensorViewSet, ProgramacionRiegoViewSet, RegisterView, AccesoValidateView, CustomLoginView, UserDetailView, ProgramacionRiegoAdminViewSet
 from rest_framework_simplejwt.views import TokenRefreshView
 
 
@@ -11,7 +11,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 router = DefaultRouter()
 router.register(r'sensores', SensorViewSet, basename='sensor')
 router.register(r'programacion_riego', ProgramacionRiegoViewSet, basename='programacion_riego')
-
+router.register(r'admin-programacion-riego', ProgramacionRiegoAdminViewSet, basename='admin-programacion-riego')
 
 # Vista raíz personalizada para que aparezcan todos los endpoints
 class ApiRootView(APIView):
@@ -23,6 +23,7 @@ class ApiRootView(APIView):
             'sensores': request.build_absolute_uri('sensores/'),
             'datos': request.build_absolute_uri('usuario-actual/'),
             'programacion_riego': request.build_absolute_uri('programacion_riego/'),
+            'admin_programacion_riego': request.build_absolute_uri('admin-programacion-riego/'),
         })
 
 
