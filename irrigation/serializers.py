@@ -4,7 +4,7 @@ from django.utils.crypto import get_random_string
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import Sensor, ProgramacionRiego
-
+from rest_framework.reverse import reverse
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
@@ -44,7 +44,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             email=email,
             password=validated_data['password'],
             first_name=validated_data['first_name'],
-            last_name=validated_data['last_name']
+            last_name=validated_data['last_name'],
+            is_active=False
         )
         return user
 
@@ -98,6 +99,18 @@ class ProgramacionRiegoSerializer(serializers.ModelSerializer):
         model = ProgramacionRiego
         fields = '__all__'
 class ProgramacionRiegoAdminSerializer(serializers.ModelSerializer):
+    acciones = serializers.SerializerMethodField()
+
     class Meta:
         model = ProgramacionRiego
         fields = '__all__'
+
+    def get_acciones(self, obj):
+        request = self.context.get('request')
+        if request is None:
+            return {}
+
+        return {
+            'modificar': reverse('programacionriegoadmin-detail', args=[obj.pk], request=request),
+            'eliminar': reverse('programacionriegoadmin-detail', args=[obj.pk], request=request),
+        }
