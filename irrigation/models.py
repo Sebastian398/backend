@@ -3,6 +3,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import timedelta
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
 
 class Sensor(models.Model):
     HUMEDAD = 'humedad'
@@ -20,6 +23,15 @@ class Sensor(models.Model):
 
     def __str__(self):
         return f"{self.get_tipo_display()} - {self.valor} - {'Activo' if self.activo else 'Inactivo'}"
+
+class LecturaSensor(models.Model):
+    sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE, related_name='lecturas')
+    valor = models.FloatField()
+    fecha_registro = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f'{self.sensor} - {self.valor} ({self.fecha_registro})'
+
 class ProgramacionRiego(models.Model):
     inicio = models.TimeField()
     duracion = models.IntegerField(help_text='Duración en minutos')
@@ -42,13 +54,20 @@ class ActivacionUsuario(models.Model):
 
     def __str__(self):
         return f"Token de activacion para {self.user.email}"
-    
-# from rest_framework import viewsets
-#from .models import Sensor, ProgramacionRiego
-#from .serializers import SensorSerializer, ProgramacionRiegoSerializer
-#from rest_framework.decorators import action
-#from rest_framework.response import Response
 
+class RegistroRiego(models.Model):
+    sensor = models.ForeignKey('Sensor', on_delete=models.CASCADE, related_name='registros')
+    usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    inicio = models.DateTimeField(default=timezone.now)
+    duracion_minutos = models.PositiveIntegerField()
+    activo = models.BooleanField(default=True)  # True durante el riego activo
+
+    def __str__(self):
+        return f"Riego en {self.sensor} iniciado {self.inicio} por {self.duracion_minutos} minutos"
+
+#from rest_framework import viewsets
+#from .serializers import SensorSerializer, ProgramacionRiegoSerializer    
+#from .models import Sensor, ProgramacionRiego
 #import RPi.GPIO as GPIO
 #import time
 

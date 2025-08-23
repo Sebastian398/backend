@@ -5,20 +5,24 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth.models import User
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from .models import Sensor, ProgramacionRiego, ActivacionUsuario
+from .models import Sensor, ProgramacionRiego, ActivacionUsuario, RegistroRiego, LecturaSensor
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.urls import reverse
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from django.utils.timezone import now, timedelta
+from django.db.models import Avg, Min, Max
 from .serializers import (
     SensorSerializer,
     ProgramacionRiegoSerializer,
     UserRegisterSerializer,
     EmailTokenObtainPairSerializer,
     UserDetailSerializer,
-    ProgramacionRiegoAdminSerializer
+    ProgramacionRiegoAdminSerializer,
+    RegistroRiegoSerializer,
+    LecturaSensorSerializer,
 )
 
 
@@ -114,6 +118,24 @@ class AccesoValidateView(APIView):
 class SensorViewSet(viewsets.ModelViewSet):
     queryset = Sensor.objects.all().order_by('-fecha_registro')
     serializer_class = SensorSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    @action(detail=True, methods=['post'])
+    def toggle(self, request, pk=None):
+        sensor = self.get_object()
+        sensor.activo = not sensor.activo
+        sensor.save()
+
+        if sensor.activo:
+            # enviar señal para activar rociador
+            mensaje_estado = 'Rociador activado'
+            # tu_logica_para_activar(sensor)
+        else:
+            # enviar señal para desactivar rociador
+            mensaje_estado = 'Rociador desactivado'
+            # tu_logica_para_desactivar(sensor)
+
+        return Response({'mensaje': mensaje_estado, 'estado': sensor.activo}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'])
     def activar(self, request, pk=None):
@@ -121,7 +143,7 @@ class SensorViewSet(viewsets.ModelViewSet):
         sensor.activo = True
         sensor.save()
         return Response({'mensaje': 'Rociador activado'}, status=status.HTTP_200_OK)
-
+    
     @action(detail=True, methods=['post'])
     def desactivar(self, request, pk=None):
         sensor = self.get_object()
@@ -156,3 +178,40 @@ class ProgramacionRiegoAdminViewSet(viewsets.ModelViewSet):
     queryset = ProgramacionRiego.objects.all().order_by('-inicio')
     serializer_class = ProgramacionRiegoAdminSerializer
     permission_classes = [IsAuthenticated]
+
+class RegistroRiegoViewSet(viewsets.ModelViewSet):
+    queryset = RegistroRiego.objects.all().order_by('-inicio')
+    serializer_class = RegistroRiegoSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(usuario=self.request.user)
+
+class LecturasHumedadList(generics.ListAPIView):
+    serializer_class = LecturaSensorSerializer
+
+    def get_queryset(self):
+        # Filtra solo sensores tipo humedad y lecturas recientes
+        humedad_sensores = Sensor.objects.filter(tipo=Sensor.HUMEDAD)
+        return LecturaSensor.objects.filter(sensor__in=humedad_sensores).order_by('-fecha_registro')
+    
+class EstadisticasHumedadSemanal(APIView):
+    def get(self, request):
+        fecha_fin = now()
+        fecha_inicio = fecha_fin - timedelta(days=7)
+
+        humedad_sensores = Sensor.objects.filter(tipo=Sensor.HUMEDAD)
+        lecturas = LecturaSensor.objects.filter(sensor__in=humedad_sensores,
+                                                fecha_registro__range=(fecha_inicio, fecha_fin))
+
+        promedio = lecturas.aggregate(promedio=Avg('valor'))['promedio']
+        minimo = lecturas.aggregate(minimo=Min('valor'))['minimo']
+        maximo = lecturas.aggregate(maximo=Max('valor'))['maximo']
+
+        return Response({
+            'fecha_inicio': fecha_inicio,
+            'fecha_fin': fecha_fin,
+            'promedio_humedad': promedio,
+            'minimo_humedad': minimo,
+            'maximo_humedad': maximo,
+        })    

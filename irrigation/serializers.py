@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.utils.crypto import get_random_string
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import Sensor, ProgramacionRiego
+from .models import Sensor, ProgramacionRiego, RegistroRiego, LecturaSensor
 from rest_framework.reverse import reverse
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -114,3 +114,16 @@ class ProgramacionRiegoAdminSerializer(serializers.ModelSerializer):
             'modificar': reverse('programacionriegoadmin-detail', args=[obj.pk], request=request),
             'eliminar': reverse('programacionriegoadmin-detail', args=[obj.pk], request=request),
         }
+
+class RegistroRiegoSerializer(serializers.ModelSerializer):
+    sensor = serializers.StringRelatedField()
+    usuario = serializers.StringRelatedField()
+
+    class Meta:
+        model = RegistroRiego
+        fields = ['id', 'sensor', 'usuario', 'inicio', 'duracion_minutos', 'activo']
+
+class LecturaSensorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LecturaSensor
+        fields = ['id', 'sensor', 'valor', 'fecha_registro']        

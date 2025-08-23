@@ -1,10 +1,8 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework.views import APIView
-from .views import ActivarCuentaView
 from rest_framework.response import Response
-
-from .views import SensorViewSet, ProgramacionRiegoViewSet, RegisterView, AccesoValidateView, CustomLoginView, UserDetailView, ProgramacionRiegoAdminViewSet
+from .views import SensorViewSet, ProgramacionRiegoViewSet, RegisterView, AccesoValidateView, CustomLoginView, UserDetailView, ProgramacionRiegoAdminViewSet, ActivarCuentaView, RegistroRiegoViewSet, LecturasHumedadList, EstadisticasHumedadSemanal
 from rest_framework_simplejwt.views import TokenRefreshView
 
 
@@ -13,6 +11,7 @@ router = DefaultRouter()
 router.register(r'sensores', SensorViewSet, basename='sensor')
 router.register(r'programacion_riego', ProgramacionRiegoViewSet, basename='programacion_riego')
 router.register(r'programacion_riego_admin', ProgramacionRiegoAdminViewSet, basename='programacionriegoadmin')
+router.register(r'registro_riego', RegistroRiegoViewSet, basename='registro_riego')
 
 class ApiRootView(APIView):
     def get(self, request, format=None):
@@ -35,5 +34,7 @@ urlpatterns = [
     path('api/acceso-validate/', AccesoValidateView.as_view(), name='acceso-validate'),
     path('usuario-actual/', UserDetailView.as_view(), name='usuario-actual'),
     path('activar-cuenta/<uuid:token>/', ActivarCuentaView.as_view(), name='activar-cuenta'),
+    path('lecturas_humedad/', LecturasHumedadList.as_view(), name='lecturas-humedad'),
+    path('estadisticas_humedad_semanal/', EstadisticasHumedadSemanal.as_view(), name='estadisticas-humedad-semanal'),
     path('', include(router.urls)),                              
 ]
