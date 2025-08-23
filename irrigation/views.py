@@ -95,10 +95,12 @@ class CustomLoginView(TokenObtainPairView):
         data = serializer.validated_data
         email = request.data.get('email', '')
 
+        password_reset_url = request.build_absolute_uri('/api/password_reset/')
         return Response({
             "mensaje": f"¡Bienvenido, {email}!",
             "access": data.get("access"),
             "refresh": data.get("refresh"),
+            "password_reset_url": password_reset_url
         })
 
 
