@@ -114,7 +114,20 @@ class AccesoValidateView(APIView):
 class SensorViewSet(viewsets.ModelViewSet):
     queryset = Sensor.objects.all().order_by('-fecha_registro')
     serializer_class = SensorSerializer
-    permission_classes = [permissions.IsAuthenticated]
+
+    @action(detail=True, methods=['post'])
+    def activar(self, request, pk=None):
+        sensor = self.get_object()
+        sensor.activo = True
+        sensor.save()
+        return Response({'mensaje': 'Rociador activado'}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'])
+    def desactivar(self, request, pk=None):
+        sensor = self.get_object()
+        sensor.activo = False
+        sensor.save()
+        return Response({'mensaje': 'Rociador desactivado'}, status=status.HTTP_200_OK)
 
 class UserDetailView(APIView):
     permission_classes = [IsAuthenticated]

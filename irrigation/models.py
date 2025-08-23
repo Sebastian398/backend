@@ -5,13 +5,21 @@ from django.utils import timezone
 from datetime import timedelta
 
 class Sensor(models.Model):
-    tipo = models.CharField(max_length=50)  # e.g. humedad, temperatura
+    HUMEDAD = 'humedad'
+    TEMPERATURA = 'temperatura'
+
+    TIPO_CHOICES = [
+        (HUMEDAD, 'Humedad'),
+        (TEMPERATURA, 'Temperatura'),
+    ]
+
+    tipo = models.CharField(max_length=12, choices=TIPO_CHOICES)    
     valor = models.FloatField()
     fecha_registro = models.DateTimeField(auto_now_add=True)
+    activo = models.BooleanField(default=False)  # False: apagado, True: encendido
 
     def __str__(self):
-        return f'{self.tipo} - {self.valor}'
-
+        return f"{self.get_tipo_display()} - {self.valor} - {'Activo' if self.activo else 'Inactivo'}"
 class ProgramacionRiego(models.Model):
     inicio = models.TimeField()
     duracion = models.IntegerField(help_text='Duración en minutos')
