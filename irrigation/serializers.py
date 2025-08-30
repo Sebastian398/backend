@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.utils.crypto import get_random_string
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import Sensor, ProgramacionRiego, RegistroRiego, LecturaSensor
+from .models import Sensor, ProgramacionRiego, RegistroRiego, LecturaSensor, Cultivo
 from rest_framework.reverse import reverse
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -95,12 +95,14 @@ class SensorSerializer(serializers.ModelSerializer):
 
 
 class ProgramacionRiegoSerializer(serializers.ModelSerializer):
+    numero_lotes = serializers.IntegerField(required=True, min_value=1)
     class Meta:
         model = ProgramacionRiego
         fields = '__all__'
 class ProgramacionRiegoAdminSerializer(serializers.ModelSerializer):
     acciones = serializers.SerializerMethodField()
-
+    numero_lotes = serializers.IntegerField(required=True, min_value=1)
+    
     class Meta:
         model = ProgramacionRiego
         fields = '__all__'
@@ -126,4 +128,9 @@ class RegistroRiegoSerializer(serializers.ModelSerializer):
 class LecturaSensorSerializer(serializers.ModelSerializer):
     class Meta:
         model = LecturaSensor
-        fields = ['id', 'sensor', 'valor', 'fecha_registro']        
+        fields = ['id', 'sensor', 'valor', 'fecha_registro']  
+
+class CultivoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cultivo
+        fields = ['id', 'nombre_cultivo', 'tipo_cultivo']      

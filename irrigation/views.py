@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth.models import User
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from .models import Sensor, ProgramacionRiego, ActivacionUsuario, RegistroRiego, LecturaSensor
+from .models import Sensor, ProgramacionRiego, ActivacionUsuario, RegistroRiego, LecturaSensor, Cultivo
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
@@ -23,6 +23,7 @@ from .serializers import (
     ProgramacionRiegoAdminSerializer,
     RegistroRiegoSerializer,
     LecturaSensorSerializer,
+    CultivoSerializer,
 )
 
 
@@ -214,4 +215,9 @@ class EstadisticasHumedadSemanal(APIView):
             'promedio_humedad': promedio,
             'minimo_humedad': minimo,
             'maximo_humedad': maximo,
-        })    
+        })
+
+class CultivoViewSet(viewsets.ModelViewSet):
+    queryset = Cultivo.objects.all().order_by('-created_at')
+    serializer_class = CultivoSerializer
+    permission_classes = [permissions.IsAuthenticated]    

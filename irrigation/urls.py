@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .views import SensorViewSet, ProgramacionRiegoViewSet, RegisterView, AccesoValidateView, CustomLoginView, UserDetailView, ProgramacionRiegoAdminViewSet, ActivarCuentaView, RegistroRiegoViewSet, LecturasHumedadList, EstadisticasHumedadSemanal
+from .views import SensorViewSet, ProgramacionRiegoViewSet, RegisterView, AccesoValidateView, CustomLoginView, UserDetailView, ProgramacionRiegoAdminViewSet, ActivarCuentaView, RegistroRiegoViewSet, LecturasHumedadList, EstadisticasHumedadSemanal, CultivoViewSet
 from rest_framework_simplejwt.views import TokenRefreshView
 
 
@@ -12,6 +12,7 @@ router.register(r'sensores', SensorViewSet, basename='sensor')
 router.register(r'programacion_riego', ProgramacionRiegoViewSet, basename='programacion_riego')
 router.register(r'programacion_riego_admin', ProgramacionRiegoAdminViewSet, basename='programacionriegoadmin')
 router.register(r'registro_riego', RegistroRiegoViewSet, basename='registro_riego')
+router.register(r'cultivos', CultivoViewSet, basename='cultivo')
 
 class ApiRootView(APIView):
     def get(self, request, format=None):
@@ -23,6 +24,10 @@ class ApiRootView(APIView):
             'datos': request.build_absolute_uri('usuario-actual/'),
             'programacion_riego': request.build_absolute_uri('programacion_riego/'),
             'programacion_riego_admin': request.build_absolute_uri('programacion_riego_admin/'),
+            'registro_riego': request.build_absolute_uri('registro_riego/'),
+            'lecturas_humedad': request.build_absolute_uri('lecturas_humedad/'),
+            'estadisticas_humedad_semanal': request.build_absolute_uri('estadisticas_humedad_semanal/'),
+            'cultivos': request.build_absolute_uri('cultivos/'),
         })
 
 

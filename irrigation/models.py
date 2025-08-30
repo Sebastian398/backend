@@ -36,6 +36,7 @@ class ProgramacionRiego(models.Model):
     inicio = models.TimeField()
     duracion = models.IntegerField(help_text='Duración en minutos')
     activo = models.BooleanField(default=True)
+    numero_lotes = models.PositiveIntegerField(null=True, blank=True)
 
     def __str__(self):
         return f'Riego a las {self.inicio} por {self.duracion} min'
@@ -64,6 +65,15 @@ class RegistroRiego(models.Model):
 
     def __str__(self):
         return f"Riego en {self.sensor} iniciado {self.inicio} por {self.duracion_minutos} minutos"
+
+class Cultivo(models.Model):
+    nombre_cultivo = models.CharField(max_length=100)
+    tipo_cultivo = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.nombre_cultivo} ({self.tipo_cultivo})"
 
 #from rest_framework import viewsets
 #from .serializers import SensorSerializer, ProgramacionRiegoSerializer    
