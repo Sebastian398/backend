@@ -220,4 +220,3 @@ class EstadisticasHumedadSemanal(APIView):
 class CultivoViewSet(viewsets.ModelViewSet):
     queryset = Cultivo.objects.all().order_by('-created_at')
     serializer_class = CultivoSerializer
-    permission_classes = [permissions.IsAuthenticated]    
